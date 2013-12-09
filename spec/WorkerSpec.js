@@ -5,7 +5,7 @@ var path = require('path');
 
 describe("html fetcher helpers", function(){
 
-  it("should have a 'readUrls' function", function(){
+  xit("should have a 'readUrls' function", function(){
     var urlArray = ["example1.com", "example2.com"];
 
     var filePath = path.join(__dirname, "/testdata/sites.txt");
