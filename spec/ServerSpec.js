@@ -6,7 +6,8 @@ var res;
 
 // allows us to run tests async
 function async(cb){
-  runs(cb);
+  waits(1)
+  runs(cb); 
 }
 
 beforeEach(function(){
@@ -54,7 +55,7 @@ describe("Node Server Request Listener Function", function() {
     });
   });
 
-  xit("Should 404 when asked for a nonexistent file", function(done) {
+  it("Should 404 when asked for a nonexistent file", function(done) {
     var req = new stubs.Request("/arglebargle", "GET");
     handler.handleRequest(req, res);
     async(function() {

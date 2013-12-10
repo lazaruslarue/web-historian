@@ -2,13 +2,13 @@ var stubs = require("./helpers/stubs");
 var htmlFetcherHelpers = require("../workers/lib/html-fetcher-helpers");
 var fs = require("fs");
 var path = require('path');
+var filePath = path.join(__dirname, "/testdata/sites.txt");
 
 describe("html fetcher helpers", function(){
 
-  xit("should have a 'readUrls' function", function(){
-    var urlArray = ["example1.com", "example2.com"];
+  it("should have a 'readUrls' function", function(){
+    var urlArray = ["http://www.example1.com", "http://www.example2.com"];
 
-    var filePath = path.join(__dirname, "/testdata/sites.txt");
 
     fs.writeFileSync(filePath, urlArray.join("\n"));
 
@@ -27,8 +27,9 @@ describe("html fetcher helpers", function(){
     });
   });
 
-  xit("should have a 'downloadUrls' function", function(){
-    var result = htmlFetcherHelpers.downloadUrls();
+  it("should have a 'downloadUrls' function", function(){
+    var result = htmlFetcherHelpers.downloadUrls(filePath);
+    waits(1);
     expect(result).toBeTruthy();
   });
 });

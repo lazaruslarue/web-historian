@@ -13,6 +13,9 @@
   "author": "",
   "license": "BSD",
   "dependencies": {
-    "request": "~2.29.0"
+    "request": "~2.29.0",
+    "mysql": "~2.0.0-rc2",
+    "node-mysql": "~0.3.4",
+    "MD5": "~1.2.0"
   }
 }
