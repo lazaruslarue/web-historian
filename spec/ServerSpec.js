@@ -38,7 +38,7 @@ describe("Node Server Request Listener Function", function() {
     });
   });
 
-  xit("Should accept posts to /", function() {
+  it("Should accept posts to /", function() {
     fs.writeFileSync(handler.datadir, ""); // reset the test file
 
     var url = "www.example.com";
@@ -46,10 +46,12 @@ describe("Node Server Request Listener Function", function() {
 
     handler.handleRequest(req, res);
 
-    var fileContents = fs.readFileSync(handler.datadir, 'utf8');
-    expect(res._responseCode).toEqual(302);
-    expect(fileContents).toEqual(url + "\n");
-    expect(res._ended).toEqual(true);
+    async(function() { // created async to solve all your probs (courtesy of TeamLaStitesRueLette!)
+      var fileContents = fs.readFileSync(handler.datadir, 'utf8');
+      expect(res._responseCode).toEqual(302);
+      expect(fileContents).toEqual(url + "\n");
+      expect(res._ended).toEqual(true);
+    });
   });
 
   xit("Should 404 when asked for a nonexistent file", function(done) {
