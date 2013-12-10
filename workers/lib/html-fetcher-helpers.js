@@ -1,4 +1,8 @@
 var sql = require('mysql');
+var fs = require('fs'); // and all that jazz
+var request = require('request'); // this is teh funk
+var md5 = require('MD5');
+var exports = {}, __dirname = '/Users/hackreactor/code/mrspothawk/2013-11-web-historian';
 var connection = sql.createConnection({
   host     : 'localhost',
   user     : 'root',
@@ -10,13 +14,10 @@ var connection = sql.createConnection({
 connection.connect();
   // connection.end();
 
-var fs = require('fs'); // and all that jazz
-var request = require('request'); // this is teh funk
-
 exports.readUrls = function(filePath, cb){
   fs.readFile(filePath, 'utf8', function (err, data) {
     if (err) throw err;
-    cb(data.split('\n'));
+    cb(data.split('\n')); // ['asdf','saf','sadf']
   });
 };
 
@@ -24,7 +25,14 @@ exports.downloadUrls = function(filePath){
   filePath = filePath || __dirname + "/data/sites.txt";
   var cb = function (urls) {
     for (var i = 0; i < urls.length; i++ ) {
-      request(urls[i]).pipe(fs.createWriteStream(i+".html"));
+      var url = urls[i];
+      request(url, function (err, resp, chunks) {
+        var name = md5(chunks+"");
+        fs.writeFile(__dirname + "/data/sites/" + name +".html", chunks+"", function (err) {
+          if (err) throw err;
+          console.log('It\'s saved!', __dirname + "/data/sites/" + name);
+        });
+      });
     }
   };
   exports.readUrls(filePath, cb);
@@ -76,7 +84,6 @@ var doPost = function(url, oldMD5){
 
   //   collect data,
   //   newMD5 = hash(data)
-    // compareAndInsert( queryReusltObj, newMD5)
 };
 
 

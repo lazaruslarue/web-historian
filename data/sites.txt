@@ -1,1 +1,6 @@
-www.google.com
+http://www.google.com
+http://www.example.com
+http://www.example1.com
+http://www.basecamp.com
+http://weirdnano.nfshosting.com
+http://www.eatsleepcoderepeat.com
