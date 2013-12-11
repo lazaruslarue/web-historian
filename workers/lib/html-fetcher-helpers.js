@@ -25,6 +25,8 @@ exports.readUrls = function(filePath, cb){
 var siteGetter = function (url) {
   var name = "";
   request(url, function (err, resp, chunks) {
+    if (err) throw err;
+    console.log(err, resp, chunks);
     name += md5(chunks) + ".html";
     fs.writeFile(__dirname + "/data/sites/" +  md5(chunks) + ".html", chunks+"", function (err) {
       if (err) throw err;
@@ -51,14 +53,12 @@ var getUpdatesToDo = function () {
 
 
 
-
-
-
 var looper = function(urlArray) {
   for (var i = 0; i< urlArray.length; i++){
-    // setTimeout(function(){
-      getQuery(urlArray[i]);
-    // },1000*i+1);
+    var url = urlArray[i];
+    setTimeout(function(){
+      getQuery(url);
+    }, 1000*(i+1));
   }
   // setInterval(getUpdatesToDo(), 1000);
 };
@@ -76,7 +76,7 @@ var getQuery = function (url) {
     if (!row) {return;}
     var oldMD5 = row['oldfile_vc250'];
     var url = row['url_vc250'];
-    connection.pause();
+    // connection.pause();
     doPost(url, oldMD5);
   });
 };
@@ -88,7 +88,7 @@ var doPost = function(url, oldMD5){
     newfile_vc250: siteGetter(url),
     oldfile_vc250: oldMD5
   };
-  connection.resume();
+  // connection.resume();
 
   connection.query(query, post, function(err, result) {
   }).on('end', function () {
