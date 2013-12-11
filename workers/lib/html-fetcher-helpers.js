@@ -26,8 +26,8 @@ var siteGetter = function (url) {
   var name = "";
   request(url, function (err, resp, chunks) {
     if (err) throw err;
-    console.log(err, resp, chunks);
     name += md5(chunks) + ".html";
+    console.log(name);
     fs.writeFile(__dirname + "/data/sites/" +  md5(chunks) + ".html", chunks+"", function (err) {
       if (err) throw err;
       console.log('It\'s saved!', __dirname + "/data/sites/" + name);
@@ -56,11 +56,8 @@ var getUpdatesToDo = function () {
 var looper = function(urlArray) {
   for (var i = 0; i< urlArray.length; i++){
     var url = urlArray[i];
-    setTimeout(function(){
-      getQuery(url);
-    }, 1000*(i+1));
+    getQuery(url);
   }
-  // setInterval(getUpdatesToDo(), 1000);
 };
 
 
@@ -77,15 +74,21 @@ var getQuery = function (url) {
     var oldMD5 = row['oldfile_vc250'];
     var url = row['url_vc250'];
     // connection.pause();
-    doPost(url, oldMD5);
+    doGetSite(url, oldMD5); 
   });
 };
 
-var doPost = function(url, oldMD5){
+doGetSite = function (url, oldMD5) {
+  var newMD5 = siteGetter(url); // check out siteGetter, make sure it returns at the right times
+  return doPost(url, oldMD5, newMD5);
+};
+
+
+var doPost = function(url, oldMD5, newMD5 ){
   var query = 'INSERT INTO archive SET ?';
   var post  = {
     url_vc250    : url,
-    newfile_vc250: siteGetter(url),
+    newfile_vc250: newMD5,
     oldfile_vc250: oldMD5
   };
   // connection.resume();
@@ -101,29 +104,8 @@ var doPost = function(url, oldMD5){
 
 /*
 
-
-
-
-TODO:
-Namescheme for filenames /md5.html
-
-ec: ** check for changes **
-
-*/
-
-
-//  url       date        old               current
-// |google|10/01/2013    |md503475035470934|md503475035470934
-// |google|10/02/2013    |md503475035470934|md503475035470934
-// |google|10/03/2013    |md503475035470934|md503475035470935
-/*
-+--------------------+--------------+------+-----+-------------------+----------------+
-| Field              | Type         | Null | Key | Default           | Extra          |
-+--------------------+--------------+------+-----+-------------------+----------------+
-| id_int4            | int(11)      | NO   | PRI | NULL              | auto_increment |
-| url_vc250          | varchar(250) | YES  |     | NULL              |                |
-| inserted_timestamp | timestamp    | NO   |     | CURRENT_TIMESTAMP |                |
-| newfile_vc250      | varchar(250) | YES  |     | NULL              |                |
-| oldfile_vc250      | varchar(250) | YES  |     | NULL              |                |
-+--------------------+--------------+------+-----+-------------------+----------------+
+insert into archive (url_vc250) values ('http://www.weirdnano.com');
+insert into archive (url_vc250) values ('http://www.hackreactor.com');
+insert into archive (url_vc250) values ('http://www.amazon.com');
+insert into archive (url_vc250) values ('http://www.yahoo.com');
 */

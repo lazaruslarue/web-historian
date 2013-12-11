@@ -10,8 +10,12 @@ exports.headers = headers = {
 };
 
 exports.serveStaticAssets = function(res, folder, asset) {
-  //Write some code here that helps serve up your static files!
-  //(Static files are things like html (yours or arhived from others...), css, or anything that doesn't change often.)
+  if (asset === '/') {asset = '/index.html';}
+  var fullpath = path.join();
+  if (fs.fileExists(fullpath)) {
+    var contents = fs.readFileSync(fullpath, 'utf8');
+    exports.sendResponse(res, undefined, 404);
+  }
 };
 
 // As you go through, keep thinking about what helper functions you can put here!
