@@ -3,6 +3,7 @@ var fs = require('fs'); // and all that jazz
 var request = require('request'); // this is teh funk
 var md5 = require('MD5');
 var exports = {}, __dirname = '/Users/hackreactor/code/mrspothawk/2013-11-web-historian';
+
 var connection = sql.createConnection({
   host     : 'localhost',
   user     : 'root',
@@ -21,32 +22,47 @@ exports.readUrls = function(filePath, cb){
   });
 };
 
-exports.downloadUrls = function(filePath){
-  filePath = filePath || __dirname + "/data/sites.txt";
-  var cb = function (urls) {
-    for (var i = 0; i < urls.length; i++ ) {
-      var url = urls[i];
-      request(url, function (err, resp, chunks) {
-        var name = md5(chunks+"");
-        fs.writeFile(__dirname + "/data/sites/" + name +".html", chunks+"", function (err) {
-          if (err) throw err;
-          console.log('It\'s saved!', __dirname + "/data/sites/" + name);
-        });
-      });
-    }
-  };
-  exports.readUrls(filePath, cb);
-  return 'success!';
+var siteGetter = function (url) {
+  var name = "";
+  request(url, function (err, resp, chunks) {
+    name += md5(chunks) + ".html";
+    fs.writeFile(__dirname + "/data/sites/" +  md5(chunks) + ".html", chunks+"", function (err) {
+      if (err) throw err;
+      console.log('It\'s saved!', __dirname + "/data/sites/" + name);
+    });
+  });
+  return name;
+};
+
+
+
+var getUpdatesToDo = function () {
+  var results = [];
+  var query = 'SELECT * '+
+              'FROM archive '+
+              ' WHERE UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(inserted_timestamp) > 200 ';
+  console.log(query);
+  connection.query(query).on('result', function(row) {
+    results.push(row['url_vc250']);
+  }).on('end', function(){
+    return looper(results);
+  });
 };
 
 
 
 
-var checkLastUpdate = function(urlArray) {
-  for (var i = 0; i< urlArray; i++){
-    runQuery( urlArray[i] );
+
+
+var looper = function(urlArray) {
+  for (var i = 0; i< urlArray.length; i++){
+    // setTimeout(function(){
+      getQuery(urlArray[i]);
+    // },1000*i+1);
   }
+  // setInterval(getUpdatesToDo(), 1000);
 };
+
 
 
 var getQuery = function (url) {
@@ -63,14 +79,13 @@ var getQuery = function (url) {
     connection.pause();
     doPost(url, oldMD5);
   });
-
 };
 
 var doPost = function(url, oldMD5){
   var query = 'INSERT INTO archive SET ?';
   var post  = {
     url_vc250    : url,
-    newfile_vc250: fileMD5(url),
+    newfile_vc250: siteGetter(url),
     oldfile_vc250: oldMD5
   };
   connection.resume();
@@ -80,10 +95,6 @@ var doPost = function(url, oldMD5){
 
     console.log('success');
   });
-
-
-  //   collect data,
-  //   newMD5 = hash(data)
 };
 
 
